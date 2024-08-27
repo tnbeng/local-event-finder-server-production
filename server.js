@@ -18,7 +18,7 @@ app.use(cors());
 connectDB()
 app.use('/test',(req,res)=>{
   res.json({message:"Everything is perfect"});
-}
+})
 
 
 app.use('/api/events', require('./routes/eventRoutes'));
