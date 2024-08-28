@@ -8,7 +8,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+// app.use(cors());
 
 // mongoose.connect(process.env.MONGO_URI, {
 //   useNewUrlParser: true,
@@ -20,6 +20,9 @@ connectDB()
 
 app.use('/api/events', require('./routes/eventRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
+app.use('/test',(req,res)=>{
+    res.json({message: "Server is working ..."})
+})
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

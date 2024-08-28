@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 // Register User
 exports.registerUser = async (req, res) => {
   const { name, email, password } = req.body;
+  console.log("Data received ",name)
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
     const user = await User.create({ name, email, password: hashedPassword });
@@ -15,6 +16,7 @@ exports.registerUser = async (req, res) => {
       token: jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' }),
     });
   } catch (error) {
+    console.log("Error occured while saving received data")
     res.status(400).json({ message: error.message });
   }
 };
