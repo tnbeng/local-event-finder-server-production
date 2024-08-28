@@ -25,14 +25,20 @@ exports.getEvent = async (req, res) => {
 exports.createEvent = async (req, res) => {
   const { title, description, date, location, category } = req.body;
   try {
-    const event = await Event.create({ title, description, date, location, category });
+    const event = await Event.create({
+      title,
+      description,
+      date,
+      location,
+      category,
+      user: req.user._id, // Associate the event with the logged-in user
+    });
     res.status(201).json(event);
   } catch (error) {
+    console.log("Error occured while creating an event: ",error)
     res.status(400).json({ message: error.message });
   }
-  res.json({m:"test success"})
 };
-
 
 //Search Events
 exports.searchEvents = async (req, res) => {
@@ -56,6 +62,28 @@ exports.searchEvents = async (req, res) => {
       const events = await Event.find(query);
       res.json(events);
   } catch (error) {
+      res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+
+exports.deleteEvent = async (req, res) => {
+  try {
+      const event = await Event.findById(req.params.id);
+
+      if (!event) {
+          return res.status(404).json({ message: 'Event not found' });
+      }
+
+      if (event.user.toString() !== req.user.id) {
+          return res.status(401).json({ message: 'Not authorized to delete this event' });
+      }
+
+      await event.deleteOne({_id:req.params.id});
+
+      res.status(200).json({ message: 'Event removed successfully' });
+  } catch (error) {
+      console.log("Error occured while deleting event ",error)
       res.status(500).json({ message: 'Server Error' });
   }
 };

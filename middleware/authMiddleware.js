@@ -1,7 +1,9 @@
 // ./middleware/authMiddleware.js
 const jwt=require('jsonwebtoken');
+const mongoose=require('mongoose');
+const User = require('../models/User');
 
-module.exports=(req, res, next) => {
+module.exports=async (req, res, next) => {
   let token;
   
   if (
@@ -11,18 +13,19 @@ module.exports=(req, res, next) => {
     try {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      
-    //   req.user = decoded; // Attach the user info to the request
-      next();
+      req.user = await User.findById(decoded.id)
+     
+     next();
     } catch (error) {
-      res.status(401);
-      throw new Error('Not authorized, token varify failed');
+      res.status(401).json({message:'Not authorized, token varify failed'});
+      console.log("Error occured while token varifing token",error);
+      return;
     }
   }
  
   if (!token) {
-    res.status(401);
-    throw new Error('Not authorized, no token');
+    res.status(401).json({message:'Token not present'});
+    return;
   }
 
 };
