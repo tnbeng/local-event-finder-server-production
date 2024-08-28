@@ -16,6 +16,9 @@ app.use(express.json());
 // }).then(() => console.log('MongoDB connected'))
 //   .catch(err => console.error(err))
 connectDB()
+app.use('/test',(req,res)=>{
+  res.json({message:"Everything is perfect"});
+})
 
 
 app.use('/api/events', require('./routes/eventRoutes'));
