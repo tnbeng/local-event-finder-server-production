@@ -32,3 +32,31 @@ exports.createEvent = async (req, res) => {
   }
   res.json({m:"test success"})
 };
+
+
+//Search Events
+exports.searchEvents = async (req, res) => {
+  const { keyword, category, date, location } = req.query;
+  let query = {};
+
+  if (keyword) {
+      query.title = { $regex: keyword, $options: 'i' }; // Case-insensitive search
+  }
+  if (category) {
+      query.category = category;
+  }
+  if (date) {
+      query.date = { $gte: new Date(date) }; // Find events on or after the date
+  }
+  if (location) {
+      query.location = location;
+  }
+
+  try {
+      const events = await Event.find(query);
+      res.json(events);
+  } catch (error) {
+      res.status(500).json({ message: 'Server Error' });
+  }
+};
+
