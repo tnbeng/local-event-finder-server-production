@@ -1,5 +1,5 @@
 const express = require('express');
-const { getEvents, getEvent, createEvent, searchEvents, deleteEvent } = require('../controllers/eventController');
+const { getEvents, getEvent, createEvent, searchEvents, deleteEvent, updateEvent } = require('../controllers/eventController');
 const  protect = require('../middleware/authMiddleware');
 const router = express.Router();
 
@@ -8,6 +8,8 @@ router.get('/', getEvents);
 router.get('/:id', getEvent);
 router.post('/', protect, createEvent);
 router.delete('/:id',protect,deleteEvent);
+router.put('/:id', protect, updateEvent);  // Add this line for updating events
+
 
 
 

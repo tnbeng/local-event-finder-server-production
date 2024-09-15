@@ -1,6 +1,6 @@
 const Event = require('../models/Event');
 
-// Get All Events
+// Get All Events   //this is not required since we are working with searchEvents functionality for finding all events ( by empty objects)
 exports.getEvents = async (req, res) => {
   try {
     const events = await Event.find();
@@ -85,6 +85,40 @@ exports.deleteEvent = async (req, res) => {
   } catch (error) {
       console.log("Error occured while deleting event ",error)
       res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+// Update Event
+exports.updateEvent = async (req, res) => {
+  const { title, description, date, location, category } = req.body;
+
+  try {
+    // Find the event by ID
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // Check if the user is authorized to update this event
+    if (event.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ message: 'Not authorized to update this event' });
+    }
+
+    // Update event fields
+    event.title = title || event.title;
+    event.description = description || event.description;
+    event.date = date || event.date;
+    event.location = location || event.location;
+    event.category = category || event.category;
+
+    // Save the updated event
+    const updatedEvent = await event.save();
+
+    res.json(updatedEvent);
+  } catch (error) {
+    console.error("Error occurred while updating event:", error);
+    res.status(400).json({ message: 'Error updating event' });
   }
 };
 
