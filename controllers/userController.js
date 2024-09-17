@@ -13,7 +13,7 @@ exports.registerUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      token: jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' }),
+      token: jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' }),
     });
   } catch (error) {
     console.log("Error occured while saving received data",error.message)
@@ -33,7 +33,7 @@ exports.loginUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      token: jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' }),
+      token: jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' }),
     });
   } catch (error) {
     console.error("Error occurred during login:", error);
@@ -79,7 +79,24 @@ exports.updateUserProfile = async (req, res) => {
   }
 };
 
-//Get all users //for admin only 
+
+
+//admin anly
+
+//delete one user 
+exports.deleteUser =async (req,res)=>{
+  try{
+    const user=await User.findByIdAndDelete(req.params.id);
+    res.json({message: 'User deleted successfully'})
+  }
+  catch(error)
+  {
+    console.log("Error occured while deleting users");
+    res.json({message:'Server error '})
+  }
+}
+
+//Get all users 
 exports.getAllUsers= async (req,res)=>{
   try {
     const users= await User.find().select('-password');

@@ -12,9 +12,9 @@ module.exports = async (req, res, next) => {
     try {
       // Extract the token from the Authorization header
       token = req.headers.authorization.split(' ')[1];
-
-      // Verify the token
+      // Verify the token  
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
 
       // Find the user by ID from the decoded token
       req.user = await User.findById(decoded.id);
@@ -26,7 +26,7 @@ module.exports = async (req, res, next) => {
 
       next(); // Proceed to the next middleware or route handler
     } catch (error) {
-      console.log("Error occurred while verifying token:", error);
+      console.log("Error occurred while verifying token:", error.message);
       res.status(401).json({ message: 'Not authorized, token verification failed' });
     }
   } else {

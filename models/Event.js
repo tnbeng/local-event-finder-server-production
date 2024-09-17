@@ -6,7 +6,8 @@ const eventSchema = new mongoose.Schema({
     date: { type: Date, required: true },
     location: { type: String, required: true },
     category: { type: String, required: true },
-    user: { // Reference to the User who created the event
+    imageUrl: { type: String, default: '' }, // Field for storing the image URL
+    user: { 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
