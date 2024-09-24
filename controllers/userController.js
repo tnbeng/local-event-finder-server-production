@@ -149,7 +149,7 @@ exports.passwordResetRequest=async (req,res)=>{
         to:user.email,
         subject:'Password Reset',
         text:`You requested a password reset. Click the link to reset your password: 
-           http://localhost:3000/reset-password/${token}`
+           ${process.env.FRONTEND_URL}/${token}`
       }
       transporter.sendMail(mailOption)
       return res.json({message:'Password reset link sent to your email successfully'})
