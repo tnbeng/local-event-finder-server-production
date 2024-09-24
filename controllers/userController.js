@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Event = require('../models/Event');
 const cloudinary=require('cloudinary');
+const transporter=require('../config/emailTransporter');
 
 // Register User
 exports.registerUser = async (req, res) => {
@@ -14,6 +15,7 @@ exports.registerUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      role:user.role,
       token: jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' }),
     });
   } catch (error) {
@@ -34,6 +36,7 @@ exports.loginUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      role:user.role,
       token: jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' }),
     });
   } catch (error) {
@@ -128,5 +131,49 @@ exports.getAllUsers= async (req,res)=>{
     res.status(200).json(users)
   } catch (error) {
     res.status(500).json({message: 'Error occured while finding all users from database'})
+  }
+}
+
+//password-reset request
+exports.passwordResetRequest=async (req,res)=>{
+    try {
+      const {email}=req.body;
+      const user=await User.findOne({email});
+      if(!user)
+      {
+        return res.json({message:'User not found'});
+      }
+      const token=jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const mailOption={
+        from:process.env.EMAIL_USER,
+        to:user.email,
+        subject:'Password Reset',
+        text:`You requested a password reset. Click the link to reset your password: 
+           http://localhost:3000/reset-password/${token}`
+      }
+      transporter.sendMail(mailOption)
+      return res.json({message:'Password reset link sent to your email successfully'})
+    } catch (error) {
+      console.log("Error occured sending password reset link email ");
+      return res.json({message:'Internal server error'})
+    }
+}
+
+//password reset
+exports.passwordReset=async(req,res)=>{
+  try {
+    const {token, newPassword}=req.body;
+    const decoded=jwt.verify(token,process.env.JWT_SECRET);
+    const user= await User.findById(decoded.id);
+    if(!user)
+    {
+      return res.json({message:"Invalid or expired token"});
+    }
+    user.password=await bcrypt.hash(newPassword,10);
+    await user.save();
+    return res.json({message:'Password has been reset successfully'})
+  } catch (error) {
+    console.log("Error occured changing password",error.message);
+    return res.json({message:"Internal server error"});
   }
 }

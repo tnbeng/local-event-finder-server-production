@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, getUserProfile, updateUserProfile, getAllUsers, deleteUser } = require('../controllers/userController');
+const { registerUser, loginUser, getUserProfile, updateUserProfile, getAllUsers, deleteUser, passwordResetRequest, passwordReset } = require('../controllers/userController');
 const router = express.Router();
 const  protect = require('../middleware/authMiddleware');
 const { deleteEvent } = require('../controllers/eventController');
@@ -13,6 +13,9 @@ router.route('/profile/event/:eventId').delete(protect, deleteEvent);
 
 router.get('/all',protect,admin,getAllUsers);
 router.delete('/:id',protect,admin,deleteUser);
+
+router.post('/password-reset-request',passwordResetRequest);
+router.post('/password-reset',passwordReset);
 
 module.exports = router;
 
