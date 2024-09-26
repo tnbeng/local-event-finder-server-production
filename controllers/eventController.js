@@ -1,5 +1,7 @@
 const Event = require('../models/Event');
-const cloudinary=require('cloudinary')
+const cloudinary=require('cloudinary');
+const Notification = require('../models/Notification');
+const User = require('../models/User');
 // Get All Events   //this is not required since we are working with searchEvents functionality for finding all events ( by empty objects)
 exports.getEvents = async (req, res) => {
   try {
@@ -42,9 +44,23 @@ exports.createEvent = async (req, res) => {
       imagePublicId,
       user: req.user._id, // Associate the event with the logged-in user
     });
+
+    const interestedUsers= await User.find({interestedCategories:category, _id: { $ne: req.user._id }});
+    const notifications=interestedUsers.map(user=>({
+      message:`A new event-${title} is created on ${category}`,
+      user:user._id,
+      event:event._id
+    }))
+
+     const savedNotifications=await Notification.insertMany(notifications);
+
+    //  req.io.emit('newNotification', savedNotifications);
+     req.io.emit('newNotification', true);
+
+
     res.status(201).json(event);
   } catch (error) {
-    console.log("Error occured while creating an event: ", error)
+    console.log("Error occured while creating an event: ", error.message)
     res.status(400).json({ message: error.message });
   }
 };
@@ -145,4 +161,32 @@ exports.updateEvent = async (req, res) => {
     res.status(400).json({ message: 'Error updating event' });
   }
 };
+
+
+//get user notification 
+exports.getEventNotifications=async(req,res)=>{
+  try {
+    const {userId}=req.params;
+    const userNotifications= await Notification.find({user:userId});
+    res.json(userNotifications);
+  } catch (error) {
+    console.log("Error occured ",error);
+    res.json({message:error.message})
+  }
+};
+
+//mark notifications as read 
+exports.marksNotificationsAsRead=async(req,res)=>{
+  try {
+    const {userId}=req.params;
+    await Notification.updateMany(
+      {user:userId,isRead:false},
+      {$set:{isRead:true}}
+    )
+    res.status(200).json({message: "Notifications marked as read."});
+  } catch (error) {
+    
+  }
+}
+
 
