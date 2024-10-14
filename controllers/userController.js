@@ -4,10 +4,17 @@ const jwt = require('jsonwebtoken');
 const Event = require('../models/Event');
 const cloudinary=require('cloudinary');
 const transporter=require('../config/emailTransporter');
+const { error } = require('console');
 
 // Register User
 exports.registerUser = async (req, res) => {
   const { name, email, password } = req.body;
+  const user= await User.findOne({email:email});
+  if(user)
+  {
+    res.status(400).json({message:'Email is already registered.Please login or use another email.'})
+    return;
+  }
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
     const user = await User.create({ name, email, password: hashedPassword });

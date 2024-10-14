@@ -93,7 +93,6 @@ exports.searchEvents = async (req, res) => {
 
 
 exports.deleteEvent = async (req, res) => {
-  console.log("hello")
   try {
     const event = await Event.findById(req.params.id);
 
@@ -110,7 +109,6 @@ exports.deleteEvent = async (req, res) => {
       await cloudinary.uploader.destroy(event.imagePublicId); // Delete image by public_id
     }
     const eventt = await event.deleteOne({ _id: req.params.id });
-    console.log("Event ", eventt)
 
     res.status(200).json({ message: 'Event and associated image deleted successfully' });
   } catch (error) {

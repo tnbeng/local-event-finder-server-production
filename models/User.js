@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     imagePublicId: { type: String, default: '' }, 
     role:{type:String,enum:['user','admin'],default:'user'},
     interestedCategories: { type: [String], default: ['Music'] }
+    
 });
 
 module.exports = mongoose.model('User', userSchema);

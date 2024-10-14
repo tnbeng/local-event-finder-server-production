@@ -8,7 +8,7 @@ const upload = require('../config/cloudinary');
 
 router.post('/register', registerUser);
 router.post('/login', loginUser);
-router.route('/profile').get(protect, getUserProfile).put(protect,upload.single('image'),updateUserProfile);
+router.route('/profile').get(protect, getUserProfile).put(protect, upload.single('image'), updateUserProfile);
 router.route('/profile/event/:eventId').delete(protect, deleteEvent);
 
 router.get('/all',protect,admin,getAllUsers);

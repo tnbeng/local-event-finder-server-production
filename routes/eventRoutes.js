@@ -32,7 +32,7 @@ router.post('/', protect, upload.single('image'), createEvent);
 router.delete('/:id', protect, deleteEvent);
 
 // Update Event
-router.put('/:id', protect, updateEvent); 
+router.put('/:id',upload.single('image'), protect, updateEvent); 
 
 // Get Notifications for User
 router.get('/notifications/:userId', getEventNotifications);
